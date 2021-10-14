@@ -20,12 +20,19 @@ public class SLList {
     //Constructor for empty list
     public SLList() {
         sentinel = new IntNode(63, null); //63 is arbitrary since the first sentinel node's item doesn't matter
-        size = 1;
+        size = 0;
     }
     public SLList (int x) {
         sentinel = new IntNode(63, null);
         sentinel.next = new IntNode(x, null);
         size = 1;
+    }
+
+    public SLList(int[] x) {
+        sentinel = new IntNode(63, null);
+        for (int value : x) {
+            addLast(value);
+        }
     }
 
     //Adds x to the front of the list
@@ -50,6 +57,15 @@ public class SLList {
         size += 1;
     }
 
+    public void deleteFirst() {
+        if (size <= 1) {
+            sentinel.next = null;
+            size = 0;
+        } else {
+            sentinel.next = sentinel.next.next;
+            size -= 1;
+        }
+    }
     /*Inefficient size method
       Private static because it interacts with the naked IntList class
 
@@ -74,9 +90,8 @@ public class SLList {
     }
 
     public static void main(String[] args) {
-        SLList L = new SLList(10);
-        L.addFirst(10);
-        L.addLast(5);
+        int[] ints = {5, 10, 7};
+        SLList L = new SLList(ints);
         System.out.println(L.size());
     }
 }
