@@ -110,15 +110,70 @@ public class Model extends Observable {
         boolean changed;
         changed = false;
 
+        /* Pseudocode:
+        For each tile in a column, starting from row 2, the row below the top.
+        1. If top tile is empty. Move tile to top. Done with tile.
+        2. To test equality. Iterate UP the column until we reach the first non null tile.
+         - If the two values are equal then move tile to that position.Merge.Update scores etc. Done with tile.
+         - Else move tile 1 below that position. (Changed might be an issue here if we have 4-8-4. Works if 4-8-0-4)
+         [check if the tile 1 below is the current position, and if so, don't move and dont update changed/continue]
+
+        manage score
+        Keep track of original and end positions
+         */
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+
+        board.setViewingPerspective(side);
+
+        for (int c = 0; c < size(); c++) {
+            if (checkColumn(c)) {changed = true;}
+        }
+
+        board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    private boolean checkColumn(int c) {
+        boolean changed = false;
+        int howFarUpToCheck = size()-1;
+        for (int r = 2; r >= 0; r--) {
+            Tile current = tile(c, r);
+            if (current != null) {
+                if (topIsEmpty(c, howFarUpToCheck, current)) {
+                    changed = true;
+                } else if (canMerge(c, howFarUpToCheck, current) || topIsEmpty(c, howFarUpToCheck - 1, current)) {
+                    changed = true;
+                    howFarUpToCheck--;
+                } else {
+                    howFarUpToCheck--;
+                }
+            }
+        }
+        return changed;
+    }
+
+    private boolean topIsEmpty(int c, int r, Tile current) {
+        if (board.tile(c, r) == null) {
+            board.move(c, r, current);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean canMerge(int c, int r, Tile current) {
+        if (tile(c, r).value() == current.value()) {
+            board.move(c, r, current);
+            score += tile(c, r).value();
+            return true;
+        }
+        return false;
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -138,7 +193,14 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
-        return false;
+       for (int width = 0; width < b.size(); width++) {
+           for (int height = 0; height < b.size(); height++) {
+               if (b.tile(width, height) == null){
+                   return true;
+               }
+           }
+       }
+       return false;
     }
 
     /**
@@ -148,6 +210,12 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (int width = 0; width < b.size(); width++) {
+            for (int height = 0; height < b.size(); height++) {
+                Tile testTile = b.tile(width, height);
+                if (testTile != null && testTile.value() == MAX_PIECE) {return true;}
+            }
+        }
         return false;
     }
 
@@ -159,6 +227,44 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if (emptySpaceExists(b)) {return true;}
+        for (int width = 0; width < b.size(); width++) {
+            for (int height = 0; height < b.size(); height++) {
+                if (canMoveLeftOrRight(b, width, height) || canMoveUpOrDown(b, width, height)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //Helper method to test if a tile can move up or down
+    private static boolean canMoveUpOrDown(Board b, int width, int height) {
+        if (height < b.size()-1) {
+            if (b.tile(width, height).value() == b.tile(width, height + 1).value()) {
+                return true;
+            }
+        }
+        if (height > 0) {
+            if (b.tile(width, height).value() == b.tile(width, height - 1).value()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //Helper method to test if a tile can move left or right
+    private static boolean canMoveLeftOrRight(Board b, int width, int height) {
+        if (width < b.size()-1) {
+            if (b.tile(width, height).value() == b.tile(width + 1, height).value()) {
+                return true;
+            }
+        }
+        if (width > 0) {
+            if (b.tile(width, height).value() == b.tile(width - 1, height).value()) {
+                return true;
+            }
+        }
         return false;
     }
 
