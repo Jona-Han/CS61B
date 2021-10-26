@@ -11,27 +11,29 @@
  getLast: The item we want to return is in position size - 1
  size: The number of items in the list should be size.
 */
+int RFACTOR = 2;
 
-public class AList<Item> {
-    private int[] items;
-    private int size;
+public class AList <Item>{
+    private Item[] items;
+    private Item size;
 
     /** Creates an empty list. */
     public AList() {
-       items = new int[100];
+       items = (Item[]) new Object[100];
        size = 0;
     }
 
     /** Resizes the underlying array to the target capacity. */
     private void resize(int capacity) {
-        int[] a = new int[capacity];
+        Item[] a = new int[capacity];
         System.arraycopy(items, 0, a, 0, size);
         items = a;
     }
 
     /** Inserts X into the back of the list. */
-    public void addLast(Item x) { if (size == items.length) {
-            resize(size + 1);
+    public void addLast(Item x) {
+        if (size == items.length) {
+            resize(size * RFACTOR);
         }
         items[size] = x;
         size++;
@@ -54,7 +56,7 @@ public class AList<Item> {
     /** Deletes item from back of the list and
      * returns deleted item. */
     public Item removeLast() {
-        int x = getLast();
+        Item x = getLast();
         size--;
         return x;
     }
