@@ -25,17 +25,21 @@ public class TimeAList {
         AList<Integer> nValues = new AList<>();
         AList<Double> times = new AList<>();
 
-        for (int n = 1000; n <= 128000; n*=2) {
+        for (int n = 1000; n <= 300000; n*=2) {
+            //Blank Alist to test the addLast method
             AList<Integer> tester = new AList<>();
+
+            //Timing the addLast for n time
             Stopwatch sw1 = new Stopwatch();
             for (int j = 0; j < n; j++) {
                tester.addLast(j);
             }
             double timeInSeconds = sw1.elapsedTime();
+
+            //Add results to ALists
             nValues.addLast(n);
             times.addLast(timeInSeconds);
         }
-
         printTimingTable(nValues, times, nValues);
     }
 }
