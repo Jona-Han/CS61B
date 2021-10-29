@@ -1,6 +1,6 @@
  /** An SLList is a list of integers, which hides the terrible truth
    * of the nakedness within. */
-public class SLList<Blorp> implements List61B<Blorp>  {
+public class SLList<Blorp> implements List61B<Blorp> {
 	private class Node {
 		public Blorp item;
 		public Node next;
@@ -31,6 +31,7 @@ public class SLList<Blorp> implements List61B<Blorp>  {
 	  *  the list. If position is greater than the
 	  *  size of the list, inserts at the end instead.
 	  */
+	 @Override
 	 public void insert(Blorp item, int position) {
 		 Node p = sentinel;
 		 while (position > 1 && p.next != null) {
@@ -42,12 +43,14 @@ public class SLList<Blorp> implements List61B<Blorp>  {
 	 }
 
  	/** Adds x to the front of the list. */
+	 @Override
  	public void addFirst(Blorp x) {
  		sentinel.next = new Node(x, sentinel.next);
  		size = size + 1;
  	}
 
  	/** Adds x to the end of the list. */
+ 	@Override
  	public void addLast(Blorp x) {
  		size = size + 1; 		
 
@@ -62,6 +65,7 @@ public class SLList<Blorp> implements List61B<Blorp>  {
  	}
 
 	 /** Returns the first item in the list. */
+	 @Override
 	 public Blorp getFirst() {
 		 return sentinel.next.item;
 	 }
@@ -78,12 +82,14 @@ public class SLList<Blorp> implements List61B<Blorp>  {
 	 }
 
 	 /** Returns last item */
+	 @Override
 	 public Blorp getLast() {
 		 Node back = getLastNode();
 		 return back.item;
 	 }
 
 	 /** Returns the ith item in the list. */
+ 	@Override
  	public Blorp get(int i) {
 		return get(i, sentinel.next);
 	}
@@ -96,11 +102,13 @@ public class SLList<Blorp> implements List61B<Blorp>  {
 	}
  	
  	/** Returns the size of the list. */
+ 	@Override
  	public int size() {
  		return size;
  	}
 
 	 /** Deletes and returns last item. */
+	 @Override
 	 public Blorp removeLast() {
 		 Node back = getLastNode();
 		 if (back == sentinel) {
@@ -116,16 +124,14 @@ public class SLList<Blorp> implements List61B<Blorp>  {
 		 return back.item;
 	 }
 
+	 //This overridden function optimizes the print method of the List61B interface
 	 @Override
-	public void print() {
-	 	System.out.println("THIS IS THE OVERRIDDEN VERSION.");
-	 	Node p = sentinel.next;
-	 	while (p != null) {
-	 		System.out.print(p.item + " ");
-	 		p = p.next;
-		}
-	}
-
+	 public void print() {
+		 System.out.println("The boss doesn't know what he's doing!");
+		 for (Node p = sentinel.next; p != null; p = p.next) {
+			System.out.print(p.item + " ");
+		 }
+	 }
 	public static void main(String[] args) {
  		/* Creates a list of one integer, namely 10 */
  		SLList L = new SLList();

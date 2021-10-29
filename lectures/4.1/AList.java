@@ -12,7 +12,7 @@
  size: The number of items in the list should be size.
 */
 
-public class AList<Item> implements List61B<Item> {
+public class AList<Item> implements List61B<Item>{
     private Item[] items;
     private int size;
 
