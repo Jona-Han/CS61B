@@ -5,9 +5,13 @@ import java.lang.reflect.Array;
 public class ArrayDeque<Item> {
     private Item[] items;
     private int size;
+    private int firstIndex;
+    private int lastIndex;
 
     public ArrayDeque() {
         items = (Item[]) new Object[8];
+        firstIndex = 4;
+        lastIndex = 4;
         size = 0;
     }
 
@@ -15,9 +19,8 @@ public class ArrayDeque<Item> {
         if (size == items.length) {
             resize(size * 2);
         }
-        Item[] temp = items;
-        System.arraycopy(temp, 0, temp, 1, size);
-        items[0] = i;
+        firstIndex = ((firstIndex - 1) + items.length) % items.length;
+        items[firstIndex] = i;
         size++;
     }
 
@@ -25,37 +28,59 @@ public class ArrayDeque<Item> {
         if (size == items.length) {
             resize(size * 2);
         }
-        items[size] = i;
+        lastIndex = (lastIndex + 1) % items.length;
+        items[lastIndex] = i;
         size++;
     }
 
     public Item removeFirst() {
-        if ((size < items.length / 4) && (size > 4)) {
-            resize(items.length / 4 );
+        if (isEmpty()) {
+            return null;
         }
-        Item first = get(0);
+
+        if ((size < items.length / 4) && (size > 4)) {
+            resize(items.length / 2);
+        }
+        Item first = get(firstIndex);
+        items[firstIndex] = null;
+
+        firstIndex = (firstIndex + 1) % items.length;
         size--;
-        System.arraycopy(items, 1, items, 0, size - 1);
         return first;
     }
 
     public Item removeLast() {
-        if ((size < items.length / 4) && (size > 4)) {
-            resize(items.length / 4);
+        if (isEmpty()) {
+            return null;
         }
-        Item last = get(size - 1);
-        items[size - 1] = null;
+
+        if ((size < items.length / 4) && (size > 4)) {
+            resize(items.length / 2);
+        }
+        Item last = get(lastIndex);
+        items[lastIndex] = null;
+
+        lastIndex = ((lastIndex - 1) + items.length) % items.length;
         size--;
         return last;
     }
 
+    //Potential complications if downsizing by greater than a factor of 2.
     private void resize(int capacity) {
         Item[] temp = (Item[]) new Object[capacity];
-        System.arraycopy(items, 0, temp, 0, size);
+        if (lastIndex < firstIndex) {
+            int firstCopy = items.length - firstIndex;
+            System.arraycopy(items, firstIndex, temp, (int) (size / 2), firstCopy);
+            System.arraycopy(items, 0, temp, (int) (size / 2) + firstCopy, size - firstCopy);
+        } else {
+            System.arraycopy(items, firstIndex, temp, (int) (size / 2), size);
+        }
         items = temp;
+        firstIndex = size / 2;
+        lastIndex = size + size / 2;
     }
 
     public int size() {return size;}
-    public Item get(int index) {return items[index];}
+    public Item get(int index) {return items[(firstIndex + index) % items.length];}
     public boolean isEmpty(){return size == 0;}
 }
