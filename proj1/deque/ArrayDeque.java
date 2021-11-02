@@ -5,13 +5,13 @@ import java.lang.reflect.Array;
 public class ArrayDeque<Item> {
     private Item[] items;
     private int size;
-    private int firstIndex;
-    private int lastIndex;
+    private int nextFirst;
+    private int nextLast;
 
     public ArrayDeque() {
         items = (Item[]) new Object[8];
-        firstIndex = 4;
-        lastIndex = 4;
+        nextFirst = 4;
+        nextLast = 5;
         size = 0;
     }
 
@@ -19,8 +19,8 @@ public class ArrayDeque<Item> {
         if (size == items.length) {
             resize(size * 2);
         }
-        firstIndex = ((firstIndex - 1) + items.length) % items.length;
-        items[firstIndex] = i;
+        items[nextFirst] = i;
+        nextFirst = ((nextFirst - 1) + items.length) % items.length;
         size++;
     }
 
@@ -28,8 +28,8 @@ public class ArrayDeque<Item> {
         if (size == items.length) {
             resize(size * 2);
         }
-        lastIndex = (lastIndex + 1) % items.length;
-        items[lastIndex] = i;
+        items[nextLast] = i;
+        nextLast = (nextLast + 1) % items.length;
         size++;
     }
 
@@ -41,10 +41,10 @@ public class ArrayDeque<Item> {
         if ((size < items.length / 4) && (size > 4)) {
             resize(items.length / 2);
         }
-        Item first = get(firstIndex);
-        items[firstIndex] = null;
+        nextFirst = (nextFirst + 1) % items.length;
+        Item first = get(nextFirst);
+        items[nextFirst] = null;
 
-        firstIndex = (firstIndex + 1) % items.length;
         size--;
         return first;
     }
@@ -57,10 +57,10 @@ public class ArrayDeque<Item> {
         if ((size < items.length / 4) && (size > 4)) {
             resize(items.length / 2);
         }
-        Item last = get(lastIndex);
-        items[lastIndex] = null;
+        nextLast = ((nextLast - 1) + items.length) % items.length;
+        Item last = get(nextLast);
+        items[nextLast] = null;
 
-        lastIndex = ((lastIndex - 1) + items.length) % items.length;
         size--;
         return last;
     }
@@ -68,19 +68,27 @@ public class ArrayDeque<Item> {
     //Potential complications if downsizing by greater than a factor of 2.
     private void resize(int capacity) {
         Item[] temp = (Item[]) new Object[capacity];
-        if (lastIndex < firstIndex) {
+        int firstIndex = (nextFirst + 1) % items.length;
+        if (nextLast > nextFirst) {
             int firstCopy = items.length - firstIndex;
-            System.arraycopy(items, firstIndex, temp, (int) (size / 2), firstCopy);
-            System.arraycopy(items, 0, temp, (int) (size / 2) + firstCopy, size - firstCopy);
+            System.arraycopy(items, firstIndex, temp, size / 2, firstCopy);
+            System.arraycopy(items, 0, temp, size / 2 + firstCopy, size - firstCopy);
         } else {
-            System.arraycopy(items, firstIndex, temp, (int) (size / 2), size);
+            System.arraycopy(items, firstIndex, temp, size / 2, size);
         }
         items = temp;
-        firstIndex = size / 2;
-        lastIndex = size + size / 2;
+        nextFirst = size / 2 - 1;
+        nextLast = size + (size / 2) + 1;
     }
 
     public int size() {return size;}
-    public Item get(int index) {return items[(firstIndex + index) % items.length];}
+    public Item get(int index) {return items[((nextFirst + 1) % items.length + index) % items.length];}
     public boolean isEmpty(){return size == 0;}
+
+    public void printDeque() {
+        for (int counter = (nextFirst + 1) % items.length; counter < nextFirst; counter++) {
+            System.out.print(items[counter] + " ");
+        }
+        System.out.println();
+    }
 }
