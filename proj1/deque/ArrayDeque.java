@@ -42,7 +42,7 @@ public class ArrayDeque<Item> {
             resize(items.length / 2);
         }
         nextFirst = (nextFirst + 1) % items.length;
-        Item first = get(nextFirst);
+        Item first = items[nextFirst];
         items[nextFirst] = null;
 
         size--;
@@ -58,7 +58,7 @@ public class ArrayDeque<Item> {
             resize(items.length / 2);
         }
         nextLast = ((nextLast - 1) + items.length) % items.length;
-        Item last = get(nextLast);
+        Item last = items[nextLast];
         items[nextLast] = null;
 
         size--;
@@ -66,19 +66,30 @@ public class ArrayDeque<Item> {
     }
 
     //Potential complications if downsizing by greater than a factor of 2.
+    //Ugly code right now to separate upsize and downsize
     private void resize(int capacity) {
         Item[] temp = (Item[]) new Object[capacity];
         int firstIndex = (nextFirst + 1) % items.length;
-        if (nextLast > nextFirst) {
-            int firstCopy = items.length - firstIndex;
-            System.arraycopy(items, firstIndex, temp, size / 2, firstCopy);
-            System.arraycopy(items, 0, temp, size / 2 + firstCopy, size - firstCopy);
+        if (capacity > items.length) {
+            if (nextLast > nextFirst) {
+                int firstCopy = items.length - firstIndex;
+                System.arraycopy(items, firstIndex, temp, size / 2, firstCopy);
+                System.arraycopy(items, 0, temp, size / 2 + firstCopy, size - firstCopy);
+            } else {
+                System.arraycopy(items, firstIndex, temp, size / 2, size);
+            }
         } else {
-            System.arraycopy(items, firstIndex, temp, size / 2, size);
+            if (nextLast < nextFirst) {
+                int firstCopy = items.length - firstIndex;
+                System.arraycopy(items, firstIndex, temp, size / 2, firstCopy);
+                System.arraycopy(items, 0, temp, size / 2 + firstCopy, size - firstCopy);
+            } else {
+                System.arraycopy(items, firstIndex, temp, size / 2, size);
+            }
         }
         items = temp;
         nextFirst = size / 2 - 1;
-        nextLast = size + (size / 2) + 1;
+        nextLast = size + (size / 2);
     }
 
     public int size() {return size;}
@@ -86,7 +97,7 @@ public class ArrayDeque<Item> {
     public boolean isEmpty(){return size == 0;}
 
     public void printDeque() {
-        for (int counter = (nextFirst + 1) % items.length; counter < nextFirst; counter++) {
+        for (int counter = (nextFirst + 1) % items.length; counter < nextLast; counter++) {
             System.out.print(items[counter] + " ");
         }
         System.out.println();
