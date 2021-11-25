@@ -1,8 +1,6 @@
 package deque;
 
-import java.lang.reflect.Array;
-
-public class ArrayDeque<Item> {
+public class ArrayDeque<Item> implements Deque<Item>{
     private Item[] items;
     private int size;
     private int nextFirst;
@@ -15,6 +13,7 @@ public class ArrayDeque<Item> {
         size = 0;
     }
 
+    @Override
     public void addFirst(Item i) {
         if (size == items.length) {
             resize(size * 2);
@@ -24,6 +23,7 @@ public class ArrayDeque<Item> {
         size++;
     }
 
+    @Override
     public void addLast(Item i) {
         if (size == items.length) {
             resize(size * 2);
@@ -33,6 +33,7 @@ public class ArrayDeque<Item> {
         size++;
     }
 
+    @Override
     public Item removeFirst() {
         if (isEmpty()) {
             return null;
@@ -49,6 +50,7 @@ public class ArrayDeque<Item> {
         return first;
     }
 
+    @Override
     public Item removeLast() {
         if (isEmpty()) {
             return null;
@@ -92,10 +94,13 @@ public class ArrayDeque<Item> {
         nextLast = size + (size / 2);
     }
 
+    @Override
     public int size() {return size;}
-    public Item get(int index) {return items[((nextFirst + 1) % items.length + index) % items.length];}
-    public boolean isEmpty(){return size == 0;}
 
+    @Override
+    public Item get(int index) {return items[((nextFirst + 1) % items.length + index) % items.length];}
+
+    @Override
     public void printDeque() {
         for (int counter = (nextFirst + 1) % items.length; counter < nextLast; counter++) {
             System.out.print(items[counter] + " ");
